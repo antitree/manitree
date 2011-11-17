@@ -8,4 +8,4 @@ Requirements:
 - AXMLPrinter2.jar - either intalled in the environment path or current directory
 
 Usage:
-- see ./manitor.py -h for usage options
+- see ./manitree.py -h for usage options

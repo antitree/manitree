@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+          package="br.com.drzoid.rightnumber"
+          android:versionCode="7"
+          android:versionName="0.6.1">
+  <application android:icon="@drawable/icon"
+               android:label="@string/app_name"
+               android:backupAgent="RightNumberBackupAgent">
+    <!-- Settings activity -->
+    <activity android:name=".RightNumberActivity"
+              android:label="@string/app_name"
+              android:configChanges="mcc|mnc|locale|touchscreen|keyboard|keyboardHidden|navigation|orientation|fontScale|uiMode">
+      <intent-filter>
+        <action android:name="android.intent.action.MAIN" />
+        <category android:name="android.intent.category.LAUNCHER" />
+      </intent-filter>
+    </activity>
+    <activity android:name=".TestNumberActivity" />
+
+    <!-- Phone number changing receiver at priority 10 -->
+    <receiver android:name=".RightNumberReceiverPriority10">
+      <!-- Use a priority greater than zero, as we need to let broadcast receivers 
+        that block calls be the last to receive the broadcast. -->
+      <intent-filter android:priority="10">
+        <action android:name="android.intent.action.NEW_OUTGOING_CALL" />
+      </intent-filter>
+    </receiver>
+
+    <!-- Phone number changing receiver at priority 0 -->
+    <receiver android:name=".RightNumberReceiverPriority0">
+      <!-- Use a priority greater than zero, as we need to let broadcast receivers 
+        that block calls be the last to receive the broadcast. -->
+      <intent-filter android:priority="0">
+        <action android:name="android.intent.action.NEW_OUTGOING_CALL" />
+      </intent-filter>
+    </receiver>
+
+    <meta-data android:name="com.google.android.backup.api_key"
+            android:value="AEdPqrEAAAAI-ugE8xpfRKx2A77au24PgzKS0jTAPc1irYqw4g" />
+  </application>
+
+  <!-- Permission for formatting phone numbers -->
+  <uses-permission android:name="android.permission.PROCESS_OUTGOING_CALLS" />
+
+  <!-- Permissions for batch updating contacts -->
+  <uses-permission android:name="android.permission.READ_CONTACTS" />
+  <uses-permission android:name="android.permission.WRITE_CONTACTS" />
+
+  <!-- Market filters -->
+  <uses-feature android:name="android.hardware.telephony" />
+  <uses-feature android:name="android.hardware.touchscreen" android:required="false" />
+  <uses-sdk android:minSdkVersion="3" />
+  <supports-screens android:anyDensity="true"
+                    android:xlargeScreens="true"
+                    android:largeScreens="true"
+                    android:normalScreens="true"
+                    android:smallScreens="true" />
+
+</manifest>

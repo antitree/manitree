@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest 
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.googlecode.gtalksms" 
+    android:versionName="3.2.2" 
+    android:versionCode="46">
+    <uses-sdk 
+        android:minSdkVersion="5" android:targetSdkVersion="10"/>
+    <uses-feature android:required="false" android:name="android.hardware.camera"></uses-feature>
+    <uses-feature android:required="false" android:name="android.hardware.camera.autofocus"></uses-feature>
+    <uses-feature android:required="false" android:name="android.hardware.location"></uses-feature>
+    <uses-feature android:required="false" android:name="android.hardware.location.gps"></uses-feature>
+    <uses-feature android:required="false" android:name="android.hardware.bluetooth"></uses-feature>
+    <uses-feature android:required="false" android:name="android.hardware.telephony"></uses-feature>
+    <application 
+        android:icon="@drawable/icon_green" 
+        android:label="GTalkSMS" 
+        android:restoreAnyVersion="true" 
+        android:backupAgent="com.googlecode.gtalksms.tools.MyBackupAgent"
+        android:debuggable="false">
+        <activity android:name="com.googlecode.gtalksms.panels.MainScreen"
+                  android:label="@string/main_panel">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity android:name="com.googlecode.gtalksms.panels.GeoPopup"
+                  android:label="@string/main_panel">
+        </activity>
+        <activity android:name="com.googlecode.gtalksms.panels.wizard.Wizard"
+                  android:label="@string/wizard">
+        </activity>
+        <activity android:name="com.googlecode.gtalksms.panels.Preferences"
+                  android:label="@string/preference_panel">
+        </activity>
+        <activity android:name="com.googlecode.gtalksms.panels.About"
+                  android:label="@string/about_panel">
+        </activity>
+        <activity android:name="com.googlecode.gtalksms.panels.LogCollector"/>
+        <service android:enabled="true" android:name="com.googlecode.gtalksms.MainService">
+            <intent-filter>
+                <action android:name="com.googlecode.gtalksms.action.CONNECT" />
+                <action android:name="com.googlecode.gtalksms.action.TOGGLE" />
+                <action android:name="com.googlecode.gtalksms.action.SEND" />
+                <action android:name="com.googlecode.gtalksms.action.NETWORK_CHANGED" />
+                <action android:name="com.googlecode.gtalksms.action.COMMAND" />
+            </intent-filter>
+        </service>
+        <receiver android:name="com.googlecode.gtalksms.WidgetProvider" >
+                    <intent-filter>
+                        <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+                <action android:name="com.googlecode.gtalksms.action.XMPP.CONNECTION_CHANGED"/>
+                <action android:name="com.googlecode.gtalksms.action.widget.ACTION" />
+            </intent-filter>            
+            <meta-data android:name="android.appwidget.provider"
+                       android:resource="@xml/appwidget_info" />
+        </receiver>
+        <service android:enabled="true" android:name="com.googlecode.gtalksms.LocationService" />
+        <receiver android:name="com.googlecode.gtalksms.receivers.BootReceiver">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <category android:name="android.intent.category.HOME" />
+            </intent-filter>
+        </receiver>
+        <receiver android:name="com.googlecode.gtalksms.receivers.PowerReceiver">
+            <intent-filter>
+                <action android:name="android.intent.action.ACTION_POWER_CONNECTED" />
+                <action android:name="android.intent.action.ACTION_POWER_DISCONNECTED" />
+            </intent-filter>
+        </receiver>
+        <receiver android:name="com.googlecode.gtalksms.receivers.SmsReceiver">
+            <intent-filter>
+                <!-- Receiver priority is set to SYSTEM_HIGH + 10 -->
+                <action android:name="android.provider.Telephony.SMS_RECEIVED" android:priority="1010" />
+            </intent-filter>
+        </receiver>
+        <activity android:name="com.googlecode.gtalksms.receivers.UrlActivity" android:label="GTalkSMS">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="http"/> 
+                <data android:scheme="https"/> 
+            </intent-filter>
+        </activity>
+        <receiver android:name="com.googlecode.gtalksms.receivers.NetworkConnectivityReceiver" android:enabled="true">
+             <intent-filter>
+                 <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
+             </intent-filter>
+        </receiver>
+        <service android:name="com.googlecode.gtalksms.KeyboardInputMethod"
+            android:label="GTalkSMS Keyboard"
+            android:permission="android.permission.BIND_INPUT_METHOD">
+            <intent-filter>
+                <action android:name="android.view.InputMethod" />
+            </intent-filter>
+            <meta-data android:name="android.view.im" android:resource="@xml/method" />
+        </service>
+        <meta-data 
+            android:name="com.google.android.backup.api_key"
+            android:value="AEdPqrEAAAAI8M6AdV8LJxkmMhej-2G7N_JLe-1BbFB-qOoM7Q" />
+        
+        <!-- Track Market installs from AdMob ads -->       
+        <receiver android:name="com.admob.android.ads.analytics.InstallReceiver" android:exported="true">
+            <intent-filter>
+                <action android:name="com.android.vending.INSTALL_REFERRER" />
+            </intent-filter>
+        </receiver>
+        
+        <!-- AdMobActivity definition -->
+        <activity 
+            android:name="com.admob.android.ads.AdMobActivity"
+            android:theme="@android:style/Theme.NoTitleBar.Fullscreen"
+            android:configChanges="orientation|keyboard|keyboardHidden" />
+
+        <!-- The application's publisher ID assigned by AdMob -->
+        <meta-data 
+            android:value="a14e5a583244738" 
+            android:name="ADMOB_PUBLISHER_ID" />
+        <!-- use a separate publisher id here to aid in tracking intersitial statistics -->
+        <meta-data 
+            android:value="a14e5a583244738" 
+            android:name="ADMOB_INTERSTITIAL_PUBLISHER_ID" />
+        
+        <uses-library android:name="android.test.runner" />
+    </application>
+    <uses-permission android:name="android.permission.BLUETOOTH" />
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />    
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.RECEIVE_SMS" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <uses-permission android:name="android.permission.READ_CONTACTS" />
+    <uses-permission android:name="android.permission.SEND_SMS" />
+    <uses-permission android:name="android.permission.READ_SMS" />
+    <uses-permission android:name="android.permission.WRITE_SMS" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.READ_LOGS" />
+    <uses-permission android:name="android.permission.VIBRATE"/>
+    <uses-permission android:name="android.permission.MODIFY_PHONE_STATE" /> <!-- For answerRingingCall() -->
+    <uses-permission android:name="android.permission.CALL_PHONE" /> <!-- For endCall() -->
+    
+    <!--
+    This declares that this app uses the instrumentation test runner targeting
+    the package of com.example.android.apis.  To run the tests use the command:
+    "adb shell am instrument -w com.example.android.apis.tests/android.test.InstrumentationTestRunner"
+    -->
+    <instrumentation android:name="android.test.InstrumentationTestRunner"
+                     android:label="Tests GTalkSMS" android:targetPackage="com.googlecode.gtalksms"/>
+</manifest>
+

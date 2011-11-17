@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<manifest android:versionCode="70" android:versionName="7.0"
+    package="com.futonredemption.nokeyguard" xmlns:android="http://schemas.android.com/apk/res/android">
+    <application android:debuggable="false"
+        android:hardwareAccelerated="true" android:icon="@drawable/icon" android:label="@string/app_name">
+        
+        <activity android:name="com.futonredemption.nokeyguard.activities.LockScreenActivity"
+                android:theme="@style/Theme.ActivityDefault">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
+        </activity>
+        
+        <activity android:enabled="true"
+            android:excludeFromRecents="true" android:exported="true"
+            android:label="@string/activity_preferences"
+            android:launchMode="singleTop"
+            android:name=".activities.NoKeyguardPreferenceActivity" android:noHistory="true" />
+            
+        <receiver android:enabled="true" android:exported="true"
+            android:label="@string/widget_label_1x1" android:name=".appwidgets.AppWidgetProvider1x1">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+                <action android:name="android.intent.action.ACTION_POWER_CONNECTED" />
+                <action android:name="android.intent.action.ACTION_POWER_DISCONNECTED" />
+            </intent-filter>
+            <meta-data android:name="android.appwidget.provider" android:resource="@xml/appwidget_1x1" />
+        </receiver>
+        <service android:enabled="true" android:exported="true"
+            android:label="@string/service_name" android:name=".services.DisableKeyguardService" />
+    </application>
+    <uses-permission android:name="android.permission.DISABLE_KEYGUARD"/>
+    <uses-feature android:name="android.hardware.touchscreen" android:required="false" />
+    <uses-sdk android:minSdkVersion="4" android:targetSdkVersion="13" />
+</manifest>

@@ -1,0 +1,130 @@
+def manifestAudit(mf, device='None'):
+#def manifestAudit(path AndroidManifest.xml, string ManifestName.xml):
+#audit the android manifest file
+
+#For each manifest file to be audited, search for the following conditions
+## sensitive provider permissions
+## intents without intent providers
+## exposing an activity or other IPC w/o having a certain permission
+## an intent without an intent filter
+## an intent with a high priority set
+## declaring a custom permission without protectionLevel
+  setupSqlite()
+  if VERBOSE:
+   print("parsing manifest: %s ..." % mf)
+
+  timestamp = time.strftime('%Y-%m-%d %H:%M:%S')
+
+  try:
+    mfxml = xml.dom.minidom.parse(mf)
+
+    node = mfxml.documentElement
+    manifest = mfxml.getElementsByTagName("manifest")
+    services = mfxml.getElementsByTagName("service")
+    providers = mfxml.getElementsByTagName("provider")
+    receivers = mfxml.getElementsByTagName("receiver")
+    applications = mfxml.getElementsByTagName("application")
+    datas = mfxml.getElementsByTagName("data")
+    intents = mfxml.getElementsByTagName("intent-filter")
+    actions = mfxml.getElementsByTagName("action")
+    granturipermissions = mfxml.getElementsByTagName("grant-uri-permission")
+
+  ##MANIFEST
+    if VERBOSE:
+      print("Looking at manifest section")
+    for node in manifest:
+      package = node.getAttribute("package")
+
+  ##SERVICES  
+    if VERBOSE:
+      print("Looking at services section")
+    #Service>android:exported=True
+    for service in services:
+      #search for illegally exported services
+      if service.getAttribute("android:exported"):
+        #print(LOW + "INFO: Service is being exported\n\n%s" % service.toxml()+ ENDCOLOR)
+        insertIntoReport(timestamp, device, package, service.toxml(),  \
+          'Exported Service',  \
+          'A service is being exported. Make sure that sensitive information is \
+          not accessible and that proper restrictions are used.', \
+          'info')
+
+  ##PROVIDERS
+    if VERBOSE:
+      print("Looking at providers")
+
+    #for provider in providers:
+      #print(provider.attributes["android:name"].value)
+      
+  ##GRANT-URI-PERMISSIONS	
+    if VERBOSE:
+      print("Looking at grant-uri-permissions")
+
+    for granturi in granturipermissions:
+      if granturi.getAttribute("android:pathPrefix"):
+        if granturi.getAttribute("android:pathPrefix") == '/':
+          #print(FAIL + "HIGH: Found a content provider sharing itself to an entire device. ::: android:pathPrefix=\"%s\" \n\n%s" % (granturi.getAttribute("android:pathPrefix"),granturi.toxml())+ENDCOLOR)
+          
+          insertIntoReport(timestamp, device, package, granturi.toxml(), \
+            'Improper Content Provider Permissions', \
+            'A content provider permission was set to allows access from any other app on the device. \
+              Content providers may contain sensitive information about an app and \
+              therefore should not be shared.', 'high')
+
+  ##APPLICATIONS
+
+  ##DATA
+    if VERBOSE:
+      print("Looking at data")
+
+    for data in datas:
+      if data.getAttribute("android:scheme") == "android_secret_code":##android secret codes access secret dialer menus that can unlock an app's hidden activities
+        xmlhost = data.getAttribute("android:host")
+        #print(WARNING + "MEDIUM: Found secret dialer code. ::: Secret Code=%s\n\n%s" % (xmlhost, data.toxml())+ENDCOLOR)
+        insertIntoReport(timestamp, device, package, data.toxml(), \
+            'Hidden Dialer Code Found', \
+              'A secret code was found in the manifest. \
+              These codes, when entered into the dialer grant access to hidden content \
+              that may contain sensitive information.', 'medium') 
+
+  ##HOST
+
+  ##INTENTS
+    if VERBOSE:
+      print("Looking at intents")
+
+    for intent in intents:
+      if intent.getAttribute("android:priority"): ##intent priorities will make a choice without the user's interaction. Often used by malware
+        #print (LOW + "LOW: Found intent priority declaration. ::: Priority = %s\n\n%s" % (intent.getAttribute("android:priority"), intent.toxml())+ENDCOLOR)
+        insertIntoReport(timestamp, device, package, intent.toxml(), \
+            'Intent Priority Set', \
+              'By setting an intent priority higher than another intent, the app \
+              effectively overrides other requests. This is commonly associated \
+              with malware.', 'low')
+
+  ##ACTIONS
+    if VERBOSE:
+      print("Looking at actions")
+
+    for action in actions:
+      if action.getAttribute("android:priority"): ##action priorities... see above
+        #print(LOW + "LOW: Found activity priority declaration. ::: Priority = %s\n\n%s" % (action.getAttribute("android:priority"), action.toxml())+ENDCOLOR)
+        insertIntoReport(timestamp, device, package, action.toxml(), \
+            'Action Priority Set', \
+            'By setting an action priority higher than another action, the app \
+              effectively overrides other requests. This is commonly associated \
+              with malware.', 'low')
+   
+    if VERBOSE:
+      print("Done processing %s " % mf)
+    
+    connection.commit()
+
+  except IOError:
+      print("couldn't find manifest file %s" % mf)
+      pass
+  except expat.ExpatError:
+      print("Invalid XML file found")
+      print("XML Error code: %s" % expat.ExpatError.code)
+      time.wait("3")
+      pass

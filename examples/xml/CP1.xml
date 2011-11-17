@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest package="com.downloader" android:versionCode="1" android:versionName="1.0" xmlns:android="http://schemas.android.com/apk/res/android">
+    <uses-permission android:name="android.permission.WAKE_LOCK"></uses-permission>
+        <application android:icon="@drawable/icon" android:label="@string/app_name"
+                android:debuggable="true">
+                <activity android:name="HotFile" android:label="@string/app_name">
+                        <intent-filter>
+                                <action android:name="android.intent.action.MAIN" />
+                                <category android:name="android.intent.category.LAUNCHER" />
+                        </intent-filter>
+                </activity>
+                <activity android:name="Preferences" android:label="Preferences"></activity>
+                <activity android:name="FileChooser" android:label="@layout/file_view"></activity>
+                <activity android:label="@layout/downloadingitem"
+                        android:name="DownloadingFileItem"></activity>
+                <service android:label="@string/app_name" android:name="DownloaderHotfile"></service>
+                <activity android:name="DownloadList" android:label="Hotfile download list"></activity>
+                <activity android:name="MovieButtons" android:label="@layout/movie_buttons"></activity>
+                <service android:permission="android.permission.WRITE_EXTERNAL_STORAGE" android:name=".Services.DownloadService"></service>
+                <provider android:name=".data.DownloadsContentProvider"
+                        android:authorities="hotfile_downloader">
+                        <grant-uri-permission android:pathPrefix="downloads"></grant-uri-permission>
+                        </provider>
+                <receiver android:name=".Services.DownloaderBroadcastReceiver" android:exported="false"></receiver>
+        </application>
+        <uses-sdk android:minSdkVersion="9" android:targetSdkVersion="9" />
+
+        <uses-permission android:name="android.permission.INTERNET"></uses-permission>
+        <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"></uses-permission>
+
+
+
+        <uses-permission android:name="android.permission.BATTERY_STATS"></uses-permission>
+        <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"></uses-permission>
+
+
+</manifest> 

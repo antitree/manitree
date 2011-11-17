@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.replica.replicaisland" 
+    android:versionName="1.4" 
+    android:versionCode="14"
+    android:installLocation="preferExternal">
+    
+    <application android:icon="@drawable/icon"
+                         android:label="@string/app_name"
+                         android:debuggable="false"
+                         android:theme="@android:style/Theme.Black.NoTitleBar.Fullscreen">
+        <activity android:name=".MainMenuActivity"
+                  android:label="@string/app_name" 
+                  android:screenOrientation="landscape" 
+                  android:configChanges="keyboardHidden|orientation" >
+                <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        
+        <activity android:name="AndouKun" android:label="@string/app_name" 
+                                  android:screenOrientation="landscape" 
+                          android:configChanges="keyboardHidden|orientation" 
+                          android:launchMode="singleTask"/>
+            
+        <activity android:name="LevelSelectActivity"
+                      android:screenOrientation="landscape" 
+                      android:configChanges="keyboardHidden|orientation" />
+                  
+            <activity android:theme="@style/Theme.ConversationDialog"
+                      android:screenOrientation="landscape" 
+                  android:configChanges="keyboardHidden|orientation" 
+                          android:name="ConversationDialogActivity"/>
+            
+            <activity android:name="DiaryActivity"
+                                  android:screenOrientation="landscape" 
+                                  android:configChanges="keyboardHidden|orientation"/>
+                                                        
+                                                        
+                <activity android:name="SetPreferencesActivity"
+                                  android:screenOrientation="landscape" 
+                          android:configChanges="keyboardHidden|orientation" />
+                                                        
+        <activity android:name="AnimationPlayerActivity"
+                  android:screenOrientation="landscape" 
+                  android:configChanges="keyboardHidden|orientation" />
+             
+        <activity android:name="ExtrasMenuActivity"
+                      android:screenOrientation="landscape" 
+                      android:configChanges="keyboardHidden|orientation" />
+                      
+                <activity android:name="DifficultyMenuActivity"
+                      android:screenOrientation="landscape" 
+                      android:configChanges="keyboardHidden|orientation" />
+                      
+                <activity android:name="GameOverActivity"
+                                  android:screenOrientation="landscape" 
+                                  android:configChanges="keyboardHidden|orientation"/>
+                                     
+        </application>
+    <uses-permission android:name="android.permission.VIBRATE"/>
+    <uses-permission xmlns:android="http://schemas.android.com/apk/res/android" 
+                     android:name="android.permission.INTERNET"/>
+        <uses-sdk android:minSdkVersion="3" android:targetSdkVersion="8"/>
+    
+        <!-- Actually, this game works fine on small screens, but the only one out 
+        right now has no 3D acceleration, so it's slow and unplayable. --> 
+        <supports-screens android:largeScreens="true"
+                          android:smallScreens="false" 
+                                          android:anyDensity="true"
+                                          android:normalScreens="true"/>
+        <!-- <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"></uses-permission>  -->
+        
+        
+</manifest> 

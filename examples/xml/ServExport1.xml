@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright 2010 Benoit Duffez
+
+     Licensed under the Apache License, Version 2.0 (the "License");
+     you may not use this file except in compliance with the License.
+     You may obtain a copy of the License at
+
+          http://www.apache.org/licenses/LICENSE-2.0
+
+     Unless required by applicable law or agreed to in writing, software
+     distributed under the License is distributed on an "AS IS" BASIS,
+     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+     See the License for the specific language governing permissions and
+     limitations under the License.
+-->
+
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+      package="org.bicou.metro.rer"
+      android:versionCode="12"
+      android:versionName="1.4.3-dev">
+    <application
+        android:icon="@drawable/icon"
+                android:theme="@android:style/Theme.Light.NoTitleBar"
+        android:label="@string/app_name">
+                
+                <activity android:name="org.bicou.metro.rer.ARERChoixLigne" android:exported="true" />
+                <activity android:name="org.bicou.metro.rer.ARERChoixStation" android:exported="true" />
+                <activity android:name="org.bicou.metro.rer.ARERChoixSens" android:exported="true" />
+                <activity android:name="org.bicou.metro.rer.ARERFicheHoraires" android:exported="true" />
+                <activity android:name="org.bicou.metro.rer.ARERStationsDesservies" android:exported="true" />
+
+                <service android:name="org.bicou.metro.rer.RERInterface" android:exported="true">
+                        <intent-filter>
+                                <action android:name="org.bicou.metro.action.PICK_PLUGIN" />
+                                <category android:name="org.bicou.metro.rer.RERInterface" />
+                        </intent-filter>
+                </service>
+                
+                <activity android:name="org.bicou.metro.tram.ATramChoixLigne" android:exported="true" />
+                <activity android:name="org.bicou.metro.tram.ATramChoixStation" android:exported="true" />
+                <activity android:name="org.bicou.metro.tram.ATramChoixSens" android:exported="true" />
+                <activity android:name="org.bicou.metro.tram.ATramFicheHoraires" android:exported="true" />
+                
+                <service android:name="org.bicou.metro.tram.TramInterface" android:exported="true">
+                        <intent-filter>
+                                <action android:name="org.bicou.metro.action.PICK_PLUGIN" />
+                                <category android:name="org.bicou.metro.tram.TramInterface" />
+                        </intent-filter>
+                </service>
+                
+                <activity android:name="org.bicou.metro.bus.ABusChoixLigne" android:exported="true" />
+                <activity android:name="org.bicou.metro.bus.ABusChoixStation" android:exported="true" />
+                <activity android:name="org.bicou.metro.bus.ABusChoixSens" android:exported="true" />
+                <activity android:name="org.bicou.metro.bus.ABusFicheHoraires" android:exported="true" />
+                
+                <service android:name="org.bicou.metro.bus.BusInterface" android:exported="true">
+                        <intent-filter>
+                                <action android:name="org.bicou.metro.action.PICK_PLUGIN" />
+                                <category android:name="org.bicou.metro.bus.BusInterface" />
+                        </intent-filter>
+                </service>
+                
+                <uses-library android:name="com.google.android.maps" />
+
+    </application>
+        
+        <uses-permission android:name="android.permission.INTERNET" />
+        <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+        
+        <uses-sdk android:minSdkVersion="3" />
+
+</manifest>

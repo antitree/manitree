@@ -1,0 +1,11 @@
+Description:
+- This tool is designed to detect points of possible insecurities based on the AndroidManifest.xml file that is included inside each Android APK. This file defines how the app will act when installed on a device and therefore is sensitive to incorrect values. For example, when sharing a content provider it's important to grant only necessary access to either read or write. A high risk setting would be a content provider that is shared out to any other app on a device.
+
+
+Requirements:
+- sun java -to run AXMLPrinter2
+- adb - either installed in the environment path or in the current directory)
+- AXMLPrinter2.jar - either intalled in the environment path or current directory
+
+Usage:
+- see ./manitor.py -h for usage options

@@ -33,7 +33,7 @@ def main():
   #options parser
 
   MODE = ''
-  parser = OptionParser(usage="%prog -f [MANIFESTFILE | APKFILE] | -D", version="%prog 0.4")
+  parser = OptionParser(usage="%prog -f [MANIFESTFILE | APKFILE] | -D", version="%prog 0.5")
   parser.set_defaults(
     inputFile = "",
   )

@@ -53,15 +53,15 @@ class Report:
     print('Intrepidus Group')
     print("*" * 50+ENDCOLOR)
     for row in cursor.fetchall():
-      #logging.debug(row)
       if(row[8]) == 'high':
-        print(FAIL+row[8].upper()+ENDCOLOR).rjust(1),
+        print(FAIL+row[8].upper()).rjust(1),
       elif(row[8]) == 'medium':
-        print(WARNING+row[8].upper()+ENDCOLOR).rjust(1),
+        print(WARNING+row[8].upper()).rjust(1),
       elif(row[8]) == 'low':
-        print(LOW+row[8].upper()+ENDCOLOR).rjust(1),
-      print(row[6]).rjust(2),
+        print(LOW+row[8].upper()).rjust(1),
+      print(row[6]+" in "+row[3]+ENDCOLOR).rjust(2)
       print("value:"+row[4]).rjust(3)
       print(row[7].strip())
+      print("*" * 50)
     
     

@@ -99,7 +99,7 @@ def main():
       tmppath = options.tmppath
 
     for device in devlist:
-      logging.debug("Starting device test on %s" % device)
+      logging.info("Starting device test on %s" % device)
       adboptions = "-s " + device
       devicetesting(adboptions, sysFilter, tmppath)
   elif MODE == 'apk':
@@ -123,11 +123,11 @@ def main():
 
 def manifesttesting(file):
   man = Manifest.Manifest()
-  logging.debug("Starting manifest audit")
+  logging.info("Starting manifest audit")
   man.manifestAudit(file)  
 
 def dirtesting(dir):
-  logging.debug("Starting directory audit")
+  logging.info("Starting directory audit")
   dirlist = os.listdir(dir)
   for file in dirlist:
     ext = file[-3:]
@@ -142,7 +142,7 @@ def dirtesting(dir):
       logging.debug("Found manifest: %s" % absfile)
       #TODO check to see if it's an axml file
       manifesttesting(absfile)
-      #time.sleep(0.5)
+      time.sleep(0.5)
     else:
       logging.debug("Not a file of interest: %s " % file)
   
@@ -156,7 +156,7 @@ def testtesting():
 
 def apktesting(file):
   apk = Apk.Apk()
-  logging.debug("Starting apk audit")
+  logging.info("Starting apk audit")
   tool = Tools.Tools()
   adb = tool.istoolinpath("adb")
   axmlppath = tool.istoolinpath("AXMLPrinter2.jar")
@@ -181,14 +181,14 @@ def devicetesting(adboptions, sysFilter=False, tmppath='/tmp/AT'):
 
   dev = Device.Device()
 
-  logging.debug("Looking for installed apps")
+  logging.info("Looking for installed apps")
   apklist = dev.apkfinder(adbpath, adboptions, sysFilter)        ##/system/app/appname
 
-  logging.debug("Beginning download...")
+  logging.info("Beginning download...")
   dllist = dev.downloader(adbpath, apklist,adboptions, tmppath) ##(/tmp/AT/appname.apk)
 
   apk = Apk.Apk()
-  logging.debug("Extracting manifest files")
+  logging.info("Extracting manifest files")
   for apkfile in dllist:
     logging.debug("dllist apk: %s" % apk)
     manifests.append(apk.manifestextractor(apkfile)) ##/tmp/AT/manifest1.bin
@@ -205,11 +205,11 @@ def devicetesting(adboptions, sysFilter=False, tmppath='/tmp/AT'):
   logging.debug("Unloading processes...")
   #time.sleep(15)##WORKAROUND: Needs at least 5 seconds otherwise xml expat error occus
 
-  logging.debug("Starting manifest audit")
+  logging.info("Starting manifest audit")
   for mf in mfxmls:
     man.manifestAudit(mf, adboptions.split()[1])                       
 
-  dev.ifeelsodirty()  ##TODO fix this. it doesn't work right now
+  #dev.ifeelsodirty()  ##TODO fix this. it doesn't work right now
 
 
 if __name__ == "__main__":

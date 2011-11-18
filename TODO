@@ -14,3 +14,5 @@
 21) add intent collision detection. 
 22) FIX REPORTING!!
 23) update findings structure to not be included in Manifest.py
+24) fix cleanup process
+25) add original path location to reporting during device tests

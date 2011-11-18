@@ -173,8 +173,8 @@ class Manifest:
 	  except IOError:
 	      print("couldn't find manifest file %s" % mf)
 	      pass
-	  #except expat.ExpatError:
-	  #    print("Invalid XML file found. Your hard drive may be too slow")
-	  #    #print("XML Error code: %s" % expat.ExpatError.args)
-	  #    time.wait("3")
-	  #    pass
+	  except expat.ExpatError:
+	      print("Invalid XML file found. This sometimes happens if the hard drive lags")
+	      #print("XML Error code: %s" % expat.ExpatError.args)
+	      time.sleep(3)
+	      pass

@@ -1,7 +1,7 @@
 0) have a tar binary that will compress the files before downloading them
  a) find /data/data/com.appname.app/ -type d -perm 777 -print (normally doesn't work) 
 1) If there is a space at the beginning of an XML, it won't process
-8) find out if an xml file is binary or not before trying to process it
+8) determine the XML mime type to see if it's binary or text
   a) update dirtesting, manifesttesting, and device testing as necessary
 9) add option to supply path where tools are located
 13) while in device mode, check to see if it's continuing an existing session

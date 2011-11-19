@@ -49,7 +49,8 @@ class Report:
     WARNING = '\033[93m'
     FAIL = '\033[91m'
     ENDCOLOR = '\033[0m'
-  
+ 
+    ##TODO: you don't need the numbers anymore 
     print(LOW+'Manitor: Android Manifest Auditing tool')
     print('Author: AntiTree 10/08/2011')
     print('Intrepidus Group')
@@ -64,11 +65,10 @@ class Report:
       print(row[6]+" in "+row[3]+ENDCOLOR).rjust(2)
       print("value:"+row[4]).rjust(3)
   
-  def html(self, data, mode="all", outputFile=False):
+  def html(self, data, outputFile=False):
     print("DEVELOPMENT: html mode selected but I haven't made that")
 
   def text(self, data, outputFile):
-    print("DEVELOPMENT: text file mode selected")
     convert = {'high' : 0, 'medium' : 1, 'low' : 2}
     data.sort(lambda x, y: cmp(convert[x['risk']],convert[y['risk']]))
     deviceSet = set([])

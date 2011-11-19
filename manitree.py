@@ -47,6 +47,11 @@ def main():
   group.add_option("-u", action="store_true", dest="userapps", help="Test only user apps")
   parser.add_option_group(group)
 #  group.add_option("-k", action="store_true", dest="keep", help="Keep APKs downloaded from a a device")
+  
+  group = OptionGroup(parser, "Output Options")
+  group.add_option("-T", action="store", dest="outputtxt", help="Save results to a text file (defaults to console)")
+  group.add_option("-H", action="store", dest="outputhtml", help="Save results to HTML (defaults to console)")
+  parser.add_option_group(group) 
 
   group = OptionGroup(parser, "Debug Options")
   group.add_option("-v", action="store_true", dest="verbose", help="Display verbose output")
@@ -88,6 +93,9 @@ def main():
   else:
     sysFilter = False
 
+
+  report = Report.Report()
+
   if MODE == 'dev':
     dev = Device.Device()
     tool = Tools.Tools()
@@ -102,23 +110,33 @@ def main():
       logging.info("Starting device test on %s" % device)
       adboptions = "-s " + device
       devicetesting(adboptions, sysFilter, tmppath)
+      output = report.devReport(device)
   elif MODE == 'apk':
     apktesting(options.inputFile)
+    ##TODO add returning the name of the package
+    output = report.allReport()
   elif MODE == 'xml':
     manifesttesting(options.inputFile)
+    output = report.allReport()
   elif MODE == 'dir':
     if not options.inputFile.endswith('/'):
       dirtesting(options.inputFile+'/')
     else:
       dirtesting(options.inputFile)
+    output = report.allReport()
   elif MODE == 'test':
     testtesting()
   else:
     parser.error("What mode are you looking for? See -h for usage.")
     sys.exit()
 
-  report = Report.Report()
-  report.console()##update this with more options
+  if output:
+    if options.outputtxt:
+      report.text(output, options.outputtxt)
+    elif options.outputhtml:
+      report.html(output, options.outputhtml)
+    else:
+      report.console(output)
 
 
 def manifesttesting(file):

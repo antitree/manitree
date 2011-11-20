@@ -40,8 +40,12 @@ def setupSqlite():
 def insertIntoReport(timestamp, device, package, vulnVal, vulnData, title, description, risk):
   reportstatement = "INSERT INTO report values(NULL, '"+timestamp+"','"+device+ \
           "', '"+package+"', '"+vulnVal+"','"+vulnData+"','"+title+"','"+description+"', '"+risk+"')"
-  cursor.execute(reportstatement)
-  connection.commit()
+  try:
+    cursor.execute(reportstatement)
+    connection.commit()
+  except sqlite3.Error, e:
+    print("Sqlite error: ", e.arges[0])
+    pass
 
 
 class Manifest:
@@ -52,14 +56,17 @@ class Manifest:
 	  ofile = open(mfxmlpath, 'w')
 	  if os.path.isfile(mfb):
 	    ##use AXMLPrinter2.jar to convert
-	    p = subprocess.Popen(['java', '-jar', str(axmlppath), str(mfb)],
-	      stdin=subprocess.PIPE, stdout=ofile, close_fds=True)
-            logging.debug("process status: "+str(p.poll()))
+	    #p = subprocess.Popen(['java', '-jar', str(axmlppath), str(mfb)],
+	      #stdin=subprocess.PIPE, stdout=ofile, close_fds=True)
+            p = subprocess.Popen(['java', '-jar', str(axmlppath), str(mfb)], stdout=subprocess.PIPE)
+            stdout, stderr = p.communicate()
+            p.wait()
+            ofile.write(stdout)
 
 	    if os.path.isfile(mfxmlpath):
 	      logging.debug("successfully converted %s " % mfxmlpath)
               
-            time.sleep(.5)##workaround due to xml processing speeds
+            #time.sleep(.5)##workaround due to xml processing speeds
 	  ofile.close()
           return mfxmlpath
 
@@ -71,6 +78,7 @@ class Manifest:
 	  timestamp = time.strftime('%Y-%m-%d %H:%M:%S')
 
 	  try:
+          #if 1==1:##DEBUG
 	    mfxml = xml.dom.minidom.parse(mf)
 
 	    node = mfxml.documentElement
@@ -171,10 +179,9 @@ class Manifest:
 	    connection.commit()
 
 	  except IOError:
-	      print("couldn't find manifest file %s" % mf)
+	      logging.debug("couldn't find manifest file %s" % mf)
 	      pass
 	  except expat.ExpatError:
-	      print("Invalid XML file found. This sometimes happens if the hard drive lags")
+	      logging.debug("Invalid XML file found. moving on")
 	      #print("XML Error code: %s" % expat.ExpatError.args)
-	      time.sleep(3)
 	      pass

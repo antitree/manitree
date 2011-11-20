@@ -27,7 +27,7 @@ class Apk:
 	  ### length in the zip file. Waiting for patch:
 	  # http://bugs.python.org/issue1757072
 
-	  #Until then, work around with with subprocess  
+	  #Until then, work around with subprocess  
 
 	  apkpath = "%s" % apk
 	  logging.debug("manifestextractor apkpath is: %s" % apkpath)

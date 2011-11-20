@@ -184,7 +184,6 @@ def apktesting(file):
 
   man = Manifest.Manifest()
   mfxml = man.binaryconverter(axmlppath,manifest) 
-  #time.sleep(1)##workaround so the processes die
   man.manifestAudit(mfxml)
 
 def devicetesting(adboptions, sysFilter=False, tmppath='/tmp/AT'):

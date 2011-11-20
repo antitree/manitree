@@ -44,7 +44,7 @@ def insertIntoReport(timestamp, device, package, vulnVal, vulnData, title, descr
     cursor.execute(reportstatement)
     connection.commit()
   except sqlite3.Error, e:
-    print("Sqlite error: ", e.arges[0])
+    print("Sqlite error: ", e.args[0])
     pass
 
 
@@ -58,7 +58,8 @@ class Manifest:
 	    ##use AXMLPrinter2.jar to convert
 	    #p = subprocess.Popen(['java', '-jar', str(axmlppath), str(mfb)],
 	      #stdin=subprocess.PIPE, stdout=ofile, close_fds=True)
-            p = subprocess.Popen(['java', '-jar', str(axmlppath), str(mfb)], stdout=subprocess.PIPE)
+            p = subprocess.Popen(['java', '-jar', str(axmlppath), str(mfb)], 
+                stdout=subprocess.PIPE, stderr=subprocess.PIPE)
             stdout, stderr = p.communicate()
             p.wait()
             ofile.write(stdout)

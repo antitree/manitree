@@ -61,7 +61,7 @@ def main():
     logging.getLogger().setLevel(logging.INFO)
 
   if not os.path.exists(options.databaseFile):
-    parser.error("%s report database not found.")
+    parser.error("%s report database not found." % options.databaseFile)
 
   report = Report.Report()
 

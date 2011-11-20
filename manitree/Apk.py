@@ -38,7 +38,11 @@ class Apk:
 	      logging.debug("APK file found: %s" % apkpath)
 	      ## unzip with -p for stdout so we can rename it
 	      p = subprocess.Popen(['unzip', '-p', '%s' % apkpath, 'AndroidManifest.xml'],
-		stdin=subprocess.PIPE, stdout=ofile, close_fds=True)
+		stdin=subprocess.PIPE, stdout=ofile, stderr=subprocess.PIPE, close_fds=True)
+              p.wait()
+              stderror, stdout = p.communicate()
+              if stderror:
+                logging.debug("stderror")
 	      logging.debug("Done extracting manifest from %s" % apk)
 	      return apkxmlpath
 	    else:

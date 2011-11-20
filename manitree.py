@@ -160,7 +160,7 @@ def dirtesting(dir):
       logging.debug("Found manifest: %s" % absfile)
       #TODO check to see if it's an axml file
       manifesttesting(absfile)
-      time.sleep(0.5)
+      #time.sleep(0.5)
     else:
       logging.debug("Not a file of interest: %s " % file)
   

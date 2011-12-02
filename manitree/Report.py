@@ -51,7 +51,7 @@ class Report:
     ENDCOLOR = '\033[0m'
  
     ##TODO: you don't need the numbers anymore 
-    print(LOW+'Manitor: Android Manifest Auditing tool')
+    print(LOW+'Manitree: Android Manifest Auditing tool')
     print('Author: AntiTree 10/08/2011')
     print('Intrepidus Group')
     print("*" * 50+ENDCOLOR)

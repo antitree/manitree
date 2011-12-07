@@ -42,7 +42,7 @@ def filterResults(name, value, data):
 class Report:
   def console(self, data): 
 
-    convert = {'high' : 0, 'medium' : 1, 'low' : 2}
+    convert = {'high' : 0, 'medium' : 1, 'low' : 2, 'info' : 3}
     data.sort(lambda x, y: cmp(convert[x['risk']],convert[y['risk']]))
 
     LOW = '\033[92m'

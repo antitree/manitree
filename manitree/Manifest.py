@@ -92,6 +92,7 @@ class Manifest:
 	    intents = mfxml.getElementsByTagName("intent-filter")
 	    actions = mfxml.getElementsByTagName("action")
 	    granturipermissions = mfxml.getElementsByTagName("grant-uri-permission")
+            permissions = mfxml.getElementsByTagName("permission")
 
 	  ##MANIFEST
 	    logging.debug("Looking at manifest section")
@@ -100,21 +101,32 @@ class Manifest:
 
 	  ##SERVICES  
 	    logging.debug("Looking at services section")
-	    #for service in services:
-	      #search for illegally exported services
-            #Disabled for now
-	    #     if service.getAttribute("android:exported"):
-	    #     	insertIntoReport(timestamp, device, package, 'Null', service.toxml(),  \
-	    #	  'Exported Service',  \
-	    #	  'A service is being exported. Make sure that sensitive information is \
-	    #	  not accessible and that proper restrictions are used.', \
-	    #	  'info')
+            ##search for services without permissions set
+            #if a service is exporeted and has no permission nor an intent filter, flag it
+             
+            for service in services:
+	       if service.getAttribute("android:exported") == 'true':
+                  ifilter = False
+                  sp = False
+                  logging.debug("Found exported service")
+                  for node in service.childNodes:
+                    if node.nodeName == 'intent-filter':
+                      #intent filter exists
+                      ifilter = True
+                  
+                  if service.getAttribute("android:permission"):
+                      #service permission exists
+                      sp = True
+              
+                  if not (ifilter or sp):
+                      insertIntoReport(timestamp, device, package, 'Null', service.toxml(),
+                        'Service Not Properly Protected',
+                        'A service was found to be shared with other apps on the device without an intent filter or a permission requirement therefore leaving it accessible to any other application on the device.', 'medium')
 
 	  ##PROVIDERS
 	    logging.debug("Looking at providers")
+            ##look for permissions being set
 
-	    #for provider in providers:
-	      #print(provider.attributes["android:name"].value)
 	      
 	  ##GRANT-URI-PERMISSIONS	
 	    logging.debug("Looking at grant-uri-permissions")
@@ -168,13 +180,49 @@ class Manifest:
 	    logging.debug("Looking at actions")
 
 	    for action in actions:
-	      if intent.getAttribute("android:priority").isdigit(): ##action priorities... see above
-                value = intent.getAttribute("android:priority")
+	      if action.getAttribute("android:priority").isdigit(): ##action priorities... see above
+                value = action.getAttribute("android:priority")
                 if int(value) > 100: 
                   logging.debug("Found priority in action")
 		  insertIntoReport(timestamp, device, package, value, action.toxml(), \
 		    'High Action Priority Set', \
 		    'By setting an action priority higher than another action, the app effectively overrides other requests. This is commonly associated with malware.', 'medium')
+
+          ##PERMISSIONS
+            logging.debug("Looking at permission")
+
+         #NOTE: list of built in permission groups: ACCOUNTS, COST_MONEY, DEVELOPMENT_TOOLS
+         #  HARDWARE_CONTROLS, LOCATION, MESSAGES, NETWORK, PERSONAL_INFO, PHONE_CALLS, STORAGE, SYSTEM_TOOLS 
+
+
+            for permission in permissions:
+              pl = permission.getAttribute("android:protectionLevel")
+              pn = permission.getAttribute("android:name")
+              if pl == "signatureOrSystem":
+                value = pl
+                logging.debug("SignatureorSystem protection level set in custom permission")
+                insertIntoReport(timestamp, device, package, value, permission.toxml(), \
+                    'Custom Permision Uses signatureOrSystem Protection Level',
+                    'A custom permission named %s, controls whether or not other applications can access the affected apps features. The use of signatureOrSystem requires that the requesting app be signed with the same signature as the one used for the system image. This value should be used only in special cases.' % pn, 'low')
+              elif pl == "signature":
+                value = pl
+                logging.debug("Signature protection level set in custom permission")
+                insertIntoReport(timestamp, device, package, value, permission.toxml(), 
+                    'Custom Permission Uses signature Protection Level',
+                    'A custom permission named %s, controls whether or not other applications can access the affected app features. The use of signature requires the requesting app to be signed the with same signature as the application that declared the permission.'% pn, 'low')
+              elif pl == "dangerous":
+                value = pl
+                logging.debug("Dangerious protection level set in custom permission")
+                insertIntoReport(timestamp, device, package, value, permission.toxml(),
+                    'Custom Permission Uses danger Protection Level',
+                    'A custom permission named %s controls whether or not other applications can access the affected apps features. The use of the dangerous label places no restrictions on which apps can access the application declaring the permission but the user will be warned that the dangerous permission is required during installation.'% pn, 'medium')
+              elif pl == "normal":
+                value = pl
+                logging.debug("Normal protection level set in custom permission")
+                insertIntoReport(timestamp, device, package, value, permission.toxml(),
+                    'Custom Permission Uses normal Protection Level', 
+                    'A custom permission named %s, controls whether or not other applications can access the affected apps features. The use of the normal label places no restrictions on which apps can access the application declaring the permission. It is important that permission does not grant sensitive access to the application.'% pn, 'medium')
+               
 	   
 	    logging.debug("Done processing %s " % mf)
 	    connection.commit()

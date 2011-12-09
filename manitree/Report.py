@@ -18,12 +18,12 @@
 
 import logging, sqlite3, time, os
 
-def connectSqlite():
+def connectSqlite(database):
   global connection
   global cursor
 
   try:
-    connection = sqlite3.connect("report.db")
+    connection = sqlite3.connect(database)
     connection.row_factory = sqlite3.Row
     cursor = connection.cursor()
   except sqlite3.Error, e:
@@ -107,10 +107,10 @@ class Report:
       f.write("%s\n" % line)
     
    
-  def devReport(self, device, package=False, risk=False, reportDate=False):
+  def devReport(self, device, package=False, risk=False, reportDate=False, database="report.db"):
     logging.debug("Starting device search for %s" % device)
     #sqlite query for a device
-    connectSqlite()
+    connectSqlite(database)
     reportstatement = "SELECT * FROM report WHERE device='"+device+"'"
     logging.debug("Sql statement: %s" % reportstatement)
     cursor.execute(reportstatement)
@@ -122,8 +122,8 @@ class Report:
     
     return data
   
-  def packageReport(self, package, device=False, risk=False, reportDate=False):
-    connectSqlite()
+  def packageReport(self, package, device=False, risk=False, reportDate=False, database="report.db"):
+    connectSqlite(database)
     reportstatement = "SELECT * FROM  report WHERE package='"+package+"'"
     cursor.execute(reportstatement)
     data = cursor.fetchall()
@@ -134,8 +134,8 @@ class Report:
 
     return data
   
-  def riskReport(self, risk, device=False, package=False, reportDate=False):
-    connectSqlite()
+  def riskReport(self, risk, device=False, package=False, reportDate=False, database="report.db"):
+    connectSqlite(database)
     reportstatement = "SELECT * FROM  report WHERE risk='"+risk+"'"  
     cursor.execute(reportstatement)
     data = cursor.fetchall()
@@ -146,8 +146,8 @@ class Report:
 
     return data
 
-  def allReport(self, device=False, package=False, risk=False, reportDate=False):
-    connectSqlite()
+  def allReport(self, device=False, package=False, risk=False, reportDate=False, database="report.db"):
+    connectSqlite(database)
     reportstatement = "SELECT * FROM  report"
     cursor.execute(reportstatement)
     data = cursor.fetchall()

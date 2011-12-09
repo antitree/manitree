@@ -21,12 +21,12 @@ import subprocess, logging, sqlite3, time, os
 import xml.parsers.expat as expat
 import xml.dom.minidom
 
-def setupSqlite():
+def setupSqlite(database):
   global connection
   global cursor
 
   try:
-    connection = sqlite3.connect("report.db")
+    connection = sqlite3.connect(database)
     cursor = connection.cursor()
     ## id, timestamp, device, vulnerable value, vulndata, summary, description, risk value
     cursor.execute('CREATE TABLE IF NOT EXISTS report \
@@ -38,13 +38,19 @@ def setupSqlite():
     sys.exit()
 
 def insertIntoReport(timestamp, device, package, vulnVal, vulnData, title, description, risk):
-  reportstatement = "INSERT INTO report values(NULL, '"+timestamp+"','"+device+ \
-          "', '"+package+"', '"+vulnVal+"','"+vulnData+"','"+title+"','"+description+"', '"+risk+"')"
+  #reportstatement = "INSERT INTO report values(NULL, '"+timestamp+"','"+device+ \
+  #        "', '"+package+"', '"+vulnVal+"','"+vulnData+"','"+title+"','"+description+"', '"+risk+"')"
+  #reportstatement = "INSERT INTO REPORT valuse(NULL, ?, ?, ?, ?, ?, ?, ?, ?", \
+  #        timestamp, device, package, vulnVal, vulnData, title, description, risk
+  #print(reportstatement)
   try:
-    cursor.execute(reportstatement)
+    cursor.execute('INSERT INTO report values (NULL, ?, ?, ?, ?, ?, ?, ?, ?)', \
+          (timestamp, device, package, vulnVal, vulnData, title, description, risk))
     connection.commit()
   except sqlite3.Error, e:
     print("Sqlite error: ", e.args[0])
+    #logging.debug("Values in error: %s %s %s %s %s %s %s" % (device, package, vulnVal, vulnData, title, description, risk))
+    
     pass
 
 
@@ -72,8 +78,8 @@ class Manifest:
           return mfxmlpath
 
 
-	def manifestAudit(self, mf, device='None'):
-	  setupSqlite()
+	def manifestAudit(self, mf, device='None', database="report.db"):
+	  setupSqlite(database)
 	  logging.debug("parsing manifest: %s ..." % mf)
 
 	  timestamp = time.strftime('%Y-%m-%d %H:%M:%S')
@@ -158,7 +164,7 @@ class Manifest:
 	      if data.getAttribute("android:scheme") == "android_secret_code":
 		xmlhost = data.getAttribute("android:host")
                 title = "Hidden Dialer Code Found"
-                desc = "A secret code was found in the manifest. These codes, when entered into the dialeri grant access to hidden content that may contain sensitive information."
+                desc = "A secret code was found in the manifest. These codes, when entered into the dialer grant access to hidden content that may contain sensitive information."
 		insertIntoReport(timestamp, device, package, xmlhost, data.toxml(), \
 		    title, desc,'medium') 
 
@@ -203,13 +209,13 @@ class Manifest:
                 logging.debug("SignatureorSystem protection level set in custom permission")
                 insertIntoReport(timestamp, device, package, value, permission.toxml(), \
                     'Custom Permision Uses signatureOrSystem Protection Level',
-                    'A custom permission named %s, controls whether or not other applications can access the affected apps features. The use of signatureOrSystem requires that the requesting app be signed with the same signature as the one used for the system image. This value should be used only in special cases.' % pn, 'low')
+                    'A custom permission named %s controls whether or not other applications can access the affected apps features. The use of signatureOrSystem requires that the requesting app be signed with the same signature as the one used for the system image. This value should be used only in special cases.' % pn, 'low')
               elif pl == "signature":
                 value = pl
                 logging.debug("Signature protection level set in custom permission")
                 insertIntoReport(timestamp, device, package, value, permission.toxml(), 
                     'Custom Permission Uses signature Protection Level',
-                    'A custom permission named %s, controls whether or not other applications can access the affected app features. The use of signature requires the requesting app to be signed the with same signature as the application that declared the permission.'% pn, 'low')
+                    'A custom permission named %s controls whether or not other applications can access the affected app features. The use of signature requires the requesting app to be signed the with same signature as the application that declared the permission.'% pn, 'low')
               elif pl == "dangerous":
                 value = pl
                 logging.debug("Dangerious protection level set in custom permission")
@@ -221,7 +227,7 @@ class Manifest:
                 logging.debug("Normal protection level set in custom permission")
                 insertIntoReport(timestamp, device, package, value, permission.toxml(),
                     'Custom Permission Uses normal Protection Level', 
-                    'A custom permission named %s, controls whether or not other applications can access the affected apps features. The use of the normal label places no restrictions on which apps can access the application declaring the permission. It is important that permission does not grant sensitive access to the application.'% pn, 'medium')
+                    'A custom permission named %s controls whether or not other applications can access the affected apps features. The use of the normal label places no restrictions on which apps can access the application declaring the permission. It is important that permission does not grant sensitive access to the application.'% pn, 'medium')
                
 	   
 	    logging.debug("Done processing %s " % mf)

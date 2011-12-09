@@ -36,6 +36,7 @@ def main():
   parser = OptionParser(usage="%prog -f [MANIFESTFILE | APKFILE] | -D", version="%prog 0.5")
   parser.set_defaults(
     inputFile = "",
+    dbpath = "report.db"
   )
   parser.add_option("-f", dest="inputFile", action="store", help='path to AndroidManifest.xml or APK (e.g. /home/user/com.something.apk, ./')
 
@@ -51,6 +52,7 @@ def main():
   group = OptionGroup(parser, "Output Options")
   group.add_option("-T", action="store", dest="outputtxt", help="Save results to a text file (defaults to console)")
   group.add_option("-H", action="store", dest="outputhtml", help="Save results to HTML (defaults to console)")
+  group.add_option("--database", action="store", dest="dbpath", help="Set the path to the sqlite3 database (defaults to report.db)")
   parser.add_option_group(group) 
 
   group = OptionGroup(parser, "Debug Options")
@@ -67,6 +69,19 @@ def main():
     logging.getLogger().setLevel(logging.DEBUG)
   else:
     logging.getLogger().setLevel(logging.INFO)
+  
+  global SQLITEDB 
+  SQLITEDB = options.dbpath 
+
+  ##if you don't want to keep results delete them
+  if 1 > 0: ##TODO add an option to control this
+    if os.path.isfile(SQLITEDB):
+      try:
+        os.remove(SQLITEDB)
+        logging.debug("Existing sqlite database removed")
+      except:
+        pass
+      
 
   if options.inputFile:
     if os.path.isdir(options.inputFile):
@@ -113,17 +128,16 @@ def main():
       output = report.devReport(device)
   elif MODE == 'apk':
     apktesting(options.inputFile)
-    ##TODO add returning the name of the package
-    output = report.allReport()
+    output = report.allReport(database=SQLITEDB)
   elif MODE == 'xml':
     manifesttesting(options.inputFile)
-    output = report.allReport()
+    output = report.allReport(database=SQLITEDB)
   elif MODE == 'dir':
     if not options.inputFile.endswith('/'):
       dirtesting(options.inputFile+'/')
     else:
       dirtesting(options.inputFile)
-    output = report.allReport()
+    output = report.allReport(database=SQLITEDB)
   elif MODE == 'test':
     testtesting()
   else:
@@ -142,7 +156,7 @@ def main():
 def manifesttesting(file):
   man = Manifest.Manifest()
   logging.info("Starting manifest audit")
-  man.manifestAudit(file)  
+  man.manifestAudit(file, database=SQLITEDB)  
 
 def dirtesting(dir):
   logging.info("Starting directory audit")
@@ -182,9 +196,13 @@ def apktesting(file):
   manifest = apk.manifestextractor(file)
   logging.debug("manifest is %s" % manifest)
 
+  ##TODO change this so that it calls manifesttesting instead.
+  ##  manifest testing needs to first verify whether or not 
+  ##  it's an axml or xml format for it to work. 
+
   man = Manifest.Manifest()
   mfxml = man.binaryconverter(axmlppath,manifest) 
-  man.manifestAudit(mfxml)
+  man.manifestAudit(mfxml, database=SQLITEDB)
 
 def devicetesting(adboptions, sysFilter=False, tmppath='/tmp/AT'):
 ##performs functions related to device testing: Downloading, extracting, processing
@@ -224,7 +242,7 @@ def devicetesting(adboptions, sysFilter=False, tmppath='/tmp/AT'):
 
   logging.info("Starting manifest audit")
   for mf in mfxmls:
-    man.manifestAudit(mf, adboptions.split()[1])                       
+    man.manifestAudit(mf, adboptions.split()[1], database=SQLITEDB)                       
 
   #dev.ifeelsodirty()  ##TODO fix this. it doesn't work right now
 

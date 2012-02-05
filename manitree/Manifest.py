@@ -21,6 +21,8 @@ import subprocess, logging, sqlite3, time, os
 import xml.parsers.expat as expat
 import xml.dom.minidom
 
+import AxmlParserPY.axmlprinter as axmlprinter
+
 def setupSqlite(database):
   global connection
   global cursor
@@ -55,30 +57,43 @@ def insertIntoReport(timestamp, device, package, vulnVal, vulnData, title, descr
 
 
 class Manifest:
-	def binaryconverter(self, axmlppath, mfb):
-	  ## convert from the binary xml format to a parseable one
-          logging.debug("mfb  is: %s" % mfb)
-	  mfxmlpath = "%s.xml" % mfb[:-4]
-	  ofile = open(mfxmlpath, 'w')
-	  if os.path.isfile(mfb):
-	    ##use AXMLPrinter2.jar to convert
-	    #p = subprocess.Popen(['java', '-jar', str(axmlppath), str(mfb)],
-	      #stdin=subprocess.PIPE, stdout=ofile, close_fds=True)
-            p = subprocess.Popen(['java', '-jar', str(axmlppath), str(mfb)], 
-                stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-            stdout, stderr = p.communicate()
-            p.wait()
-            ofile.write(stdout)
+	def binaryconverter(self, mfb):
+	  bincheck = False
+	  ## check to see if it's in AXML or standard xml format:
+	  xmlbuff = open(mfb, 'rb')
+	  xmlcheck = xmlbuff
+	  try:
+	    chunk = xmlcheck.read(1024)
+	    if '\0' in chunk:
+	      bincheck = True
+	  finally:
+	    logging.debug("Binary file check complete")
 
-	    if os.path.isfile(mfxmlpath):
-	      logging.debug("successfully converted %s " % mfxmlpath)
+	  if not bincheck:
+	    logging.debug("XML file is not binary. No need to convert")
+	    mfxmlpath = mfb
+	  else:
+	    logging.debug("Binary check complete") 
+	    ## convert from the binary xml format to a parseable one
+	    parse = axmlprinter.AXMLPrinter(open(mfb, 'rb').read())
+	    prettyxml = xml.dom.minidom.parseString(parse.getBuff()).toxml()
+
+	    #FIXME no need to use files any more. Send buffer directly in for processing
+            logging.debug("mfb  is: %s" % mfb)
+	    mfxmlpath = "%s.xml" % mfb[:-4]
+	    ofile = open(mfxmlpath, 'w')
+	    if os.path.isfile(mfb):
+              ofile.write(prettyxml)
+
+	      if os.path.isfile(mfxmlpath):
+	        logging.debug("successfully converted %s " % mfxmlpath)
               
-            #time.sleep(.5)##workaround due to xml processing speeds
-	  ofile.close()
+	    ofile.close()
           return mfxmlpath
 
 
 	def manifestAudit(self, mf, device='None', database="report.db"):
+	  mf = self.binaryconverter(mf)
 	  setupSqlite(database)
 	  logging.debug("parsing manifest: %s ..." % mf)
 

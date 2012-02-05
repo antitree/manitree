@@ -182,27 +182,18 @@ def testtesting():
   tool = Tools.Tools()
   adb = tool.istoolinpath('adb')
   print adb
-  #check to see if axml2print is installed
-  axmlppath = tool.istoolinpath('AXMLPrinter2.jar')
-  print axmlppath
 
 def apktesting(file):
   apk = Apk.Apk()
   logging.info("Starting apk audit")
   tool = Tools.Tools()
   adb = tool.istoolinpath("adb")
-  axmlppath = tool.istoolinpath("AXMLPrinter2.jar")
   logging.debug("input file is %s" % file)
   manifest = apk.manifestextractor(file)
   logging.debug("manifest is %s" % manifest)
 
-  ##TODO change this so that it calls manifesttesting instead.
-  ##  manifest testing needs to first verify whether or not 
-  ##  it's an axml or xml format for it to work. 
-
   man = Manifest.Manifest()
-  mfxml = man.binaryconverter(axmlppath,manifest) 
-  man.manifestAudit(mfxml, database=SQLITEDB)
+  man.manifestAudit(manifest, database=SQLITEDB)
 
 def devicetesting(adboptions, sysFilter=False, tmppath='/tmp/AT'):
 ##performs functions related to device testing: Downloading, extracting, processing
@@ -211,7 +202,6 @@ def devicetesting(adboptions, sysFilter=False, tmppath='/tmp/AT'):
   dllist = []
 
   tool = Tools.Tools()
-  axmlppath = tool.istoolinpath('AXMLPrinter2.jar')
   adbpath = tool.istoolinpath('adb')
 
   dev = Device.Device()
@@ -232,18 +222,11 @@ def devicetesting(adboptions, sysFilter=False, tmppath='/tmp/AT'):
 
   man = Manifest.Manifest()
 
-  logging.debug("Starting binary conversion")
+  logging.debug("Starting manifest audit")
   for mfb in manifests:
     if mfb: ##FIX THIS. There shouldn't be blanks in the list
-      mfxmls.append(man.binaryconverter(axmlppath,mfb))    ##/tmp/at/manifest1.xml
+      mfxmls.append(man.manifestAudit(mfb))    ##/tmp/at/manifest1.xml
   
-  logging.debug("Unloading processes...")
-  #time.sleep(15)##WORKAROUND: Needs at least 5 seconds otherwise xml expat error occus
-
-  logging.info("Starting manifest audit")
-  for mf in mfxmls:
-    man.manifestAudit(mf, adboptions.split()[1], database=SQLITEDB)                       
-
   #dev.ifeelsodirty()  ##TODO fix this. it doesn't work right now
 
 

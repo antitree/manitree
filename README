@@ -3,9 +3,7 @@ This tool is designed to detect points of possible insecurities based on the And
 
 
 Requirements:
-- sun java -to run AXMLPrinter2
 - adb - either installed in the environment path or in the current directory)
-- AXMLPrinter2.jar - either intalled in the environment path or current directory
 
 Usage:
 - see ./manitree.py -h for usage options

@@ -24,7 +24,7 @@ def main():
     version ="%prog 0.1")
   parser.set_defaults( \
     databaseFile="report.db",
-    device=False, package=False, risk=False
+    device=False, package=False, risk=False, 
   )
   parser.add_option("-T", dest="txtFile", action="store",  \
    help='path to text output')

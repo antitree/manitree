@@ -53,6 +53,7 @@ def main():
   group.add_option("-T", action="store", dest="outputtxt", help="Save results to a text file (defaults to console)")
   group.add_option("-H", action="store", dest="outputhtml", help="Save results to HTML (defaults to console)")
   group.add_option("--database", action="store", dest="dbpath", help="Set the path to the sqlite3 database (defaults to report.db)")
+  group.add_option("-a", action="store_true", dest="append", help="Append results to existing database")
   parser.add_option_group(group) 
 
   group = OptionGroup(parser, "Debug Options")
@@ -74,7 +75,7 @@ def main():
   SQLITEDB = options.dbpath 
 
   ##if you don't want to keep results delete them
-  if 1 > 0: ##TODO add an option to control this
+  if options.append: 
     if os.path.isfile(SQLITEDB):
       try:
         os.remove(SQLITEDB)

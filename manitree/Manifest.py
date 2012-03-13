@@ -40,11 +40,6 @@ def setupSqlite(database):
     sys.exit()
 
 def insertIntoReport(timestamp, device, package, vulnVal, vulnData, title, description, risk):
-  #reportstatement = "INSERT INTO report values(NULL, '"+timestamp+"','"+device+ \
-  #        "', '"+package+"', '"+vulnVal+"','"+vulnData+"','"+title+"','"+description+"', '"+risk+"')"
-  #reportstatement = "INSERT INTO REPORT valuse(NULL, ?, ?, ?, ?, ?, ?, ?, ?", \
-  #        timestamp, device, package, vulnVal, vulnData, title, description, risk
-  #print(reportstatement)
   try:
     cursor.execute('INSERT INTO report values (NULL, ?, ?, ?, ?, ?, ?, ?, ?)', \
           (timestamp, device, package, vulnVal, vulnData, title, description, risk))
@@ -120,6 +115,14 @@ class Manifest:
 	    for node in manifest:
 	      package = node.getAttribute("package")
 
+	  ##RECEIVER
+	    logging.debug("Looking at receiver section")
+	    ##process receiver example
+	      #<receiver android:name=".binarySMS.AdvertBinarySMSReceiver">
+              #<intent-filter android:priority="2147483540">
+              #  <action android:name="android.intent.action.DATA_SMS_RECEIVED" />
+              #  <data android:scheme="sms" android:host="localhost" android:port="3777" />
+
 	  ##SERVICES  
 	    logging.debug("Looking at services section")
             ##search for services without permissions set
@@ -140,7 +143,8 @@ class Manifest:
                       sp = True
               
                   if not (ifilter or sp):
-                      insertIntoReport(timestamp, device, package, 'Null', service.toxml(),
+		      servicename = service.getAttribute("android:name")
+                      insertIntoReport(timestamp, device, package, servicename, service.toxml(),
                         'Service Not Properly Protected',
                         'A service was found to be shared with other apps on the device without an intent filter or a permission requirement therefore leaving it accessible to any other application on the device.', 'medium')
 
@@ -181,7 +185,13 @@ class Manifest:
                 title = "Hidden Dialer Code Found"
                 desc = "A secret code was found in the manifest. These codes, when entered into the dialer grant access to hidden content that may contain sensitive information."
 		insertIntoReport(timestamp, device, package, xmlhost, data.toxml(), \
-		    title, desc,'medium') 
+		    title, desc,'medium')
+	      elif data.getAttribute("android:port"):
+		dataport = data.getAttribute("android:port")
+		title = "Data SMS Receiver Set"
+		desc = "A binary SMS recevier is configured to listen on a port. Binary SMS messages sent to a device are processed by the application in whichever way the developer choses. The data in this SMS should be properly validated by the application. Furthermore, the application should assume that the SMS being received is from an untrusted source."
+		insertIntoReport(timestamp, device, package, dataport, data.toxml(), \
+		    title, desc, 'high')
 
 	  ##HOST
 

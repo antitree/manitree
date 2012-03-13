@@ -43,7 +43,7 @@ class Report:
   def console(self, data): 
 
     convert = {'high' : 0, 'medium' : 1, 'low' : 2, 'info' : 3}
-    data.sort(lambda x, y: cmp(convert[x['risk']],convert[y['risk']]))
+    #data.sort(lambda x, y: cmp(convert[x['risk']],convert[y['risk']]))
 
     LOW = '\033[92m'
     WARNING = '\033[93m'
@@ -55,15 +55,19 @@ class Report:
     print('Author: AntiTree 10/08/2011')
     print('Intrepidus Group')
     print("*" * 50+ENDCOLOR)
+    package = ''
     for row in data:
+      if not package == row[3]:
+        package = row[3]
+        print('\nApp: '+package)
       if(row[8]) == 'high':
         print(FAIL+row[8].upper()).rjust(1),
       elif(row[8]) == 'medium':
         print(WARNING+row[8].upper()).rjust(1),
       elif(row[8]) == 'low':
         print(LOW+row[8].upper()).rjust(1),
-      print(row[6]+" in "+row[3]+ENDCOLOR).rjust(2)
-      print("value:"+row[4]).rjust(3)
+      print(row[6]).rjust(2)
+      print("\tvalue:"+row[4]+ENDCOLOR).rjust(3)
   
   def html(self, data, outputFile=False):
     print("DEVELOPMENT: html mode selected but I haven't made that")
@@ -122,9 +126,12 @@ class Report:
     
     return data
   
-  def packageReport(self, package, device=False, risk=False, reportDate=False, database="report.db"):
+  def packageReport(self, package=False, device=False, risk=False, reportDate=False, database="report.db"):
     connectSqlite(database)
-    reportstatement = "SELECT * FROM  report WHERE package='"+package+"'"
+    if package:
+      reportstatement = "SELECT * FROM  report WHERE package='"+package+"'"
+    else:
+      reportstatement = "SELECT * FROM report WHERE package != ''"
     cursor.execute(reportstatement)
     data = cursor.fetchall()
    
@@ -148,7 +155,7 @@ class Report:
 
   def allReport(self, device=False, package=False, risk=False, reportDate=False, database="report.db"):
     connectSqlite(database)
-    reportstatement = "SELECT * FROM  report"
+    reportstatement = "SELECT * FROM report group by package,risk"
     cursor.execute(reportstatement)
     data = cursor.fetchall()
 

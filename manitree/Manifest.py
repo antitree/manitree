@@ -61,6 +61,7 @@ class Manifest:
 	    chunk = xmlcheck.read(1024)
 	    if '\0' in chunk:
 	      bincheck = True
+	    xmlcheck.close()
 	  finally:
 	    logging.debug("Binary file check complete")
 
@@ -70,20 +71,24 @@ class Manifest:
 	  else:
 	    logging.debug("Binary check complete") 
 	    ## convert from the binary xml format to a parseable one
-	    parse = axmlprinter.AXMLPrinter(open(mfb, 'rb').read())
-	    prettyxml = xml.dom.minidom.parseString(parse.getBuff()).toxml()
+	    try:
+	      parse = axmlprinter.AXMLPrinter(open(mfb, 'rb').read())
+	      prettyxml = xml.dom.minidom.parseString(parse.getBuff()).toxml()
 
-	    #FIXME no need to use files any more. Send buffer directly in for processing
-            logging.debug("mfb  is: %s" % mfb)
-	    mfxmlpath = "%s.xml" % mfb[:-4]
-	    ofile = open(mfxmlpath, 'w')
-	    if os.path.isfile(mfb):
-              ofile.write(prettyxml)
+	      #FIXME no need to use files any more. Send buffer directly in for processing
+              logging.debug("mfb  is: %s" % mfb)
+	      mfxmlpath = "%s.xml" % mfb[:-4]
+	      ofile = open(mfxmlpath, 'w')
+	      if os.path.isfile(mfb):
+                ofile.write(prettyxml)
 
-	      if os.path.isfile(mfxmlpath):
-	        logging.debug("successfully converted %s " % mfxmlpath)
+	        if os.path.isfile(mfxmlpath):
+	          logging.debug("successfully converted %s " % mfxmlpath)
               
-	    ofile.close()
+	      ofile.close()
+	    except:
+	      logging.error("Unable to convert AXML binary in %s" % mfb)
+	      
           return mfxmlpath
 
 

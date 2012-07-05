@@ -155,7 +155,7 @@ class Report:
 
   def allReport(self, device=False, package=False, risk=False, reportDate=False, database="report.db"):
     connectSqlite(database)
-    reportstatement = "SELECT * FROM report group by package,risk"
+    reportstatement = "SELECT * FROM report"
     cursor.execute(reportstatement)
     data = cursor.fetchall()
 

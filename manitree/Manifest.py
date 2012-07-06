@@ -90,7 +90,7 @@ class Manifest:
         except:
             logging.error("Unable to convert AXML binary in %s" % mfb)
           
-            return mfxmlpath
+        return mfxmlpath
 
 
     def manifestAudit(self, mf, device='None', database="report.db"):
@@ -307,6 +307,6 @@ class Manifest:
             logging.debug("Invalid XML file found. moving on")
         #print("XML Error code: %s" % expat.ExpatError.args)
             pass
-        except AttributeError, e:
-            logging.debug("Attribute error: %s" % e)
-            pass
+        #except AttributeError, e:
+        #    logging.debug("Attribute error: %s" % e)
+        #    pass

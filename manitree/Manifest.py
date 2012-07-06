@@ -52,39 +52,44 @@ def insertIntoReport(timestamp, device, package, vulnVal, vulnData, title, descr
 
 
 class Manifest:
-    def binaryconverter(self, mfb):
-      bincheck = False
-      ## check to see if it's in AXML or standard xml format:
-      xmlbuff = open(mfb, 'rb')
-      xmlcheck = xmlbuff
-      try:
-        chunk = xmlcheck.read(1024)
-        if '\0' in chunk:
-          bincheck = True
-      finally:
-        logging.debug("Binary file check complete")
+	def binaryconverter(self, mfb):
+	  bincheck = False
+	  ## check to see if it's in AXML or standard xml format:
+	  xmlbuff = open(mfb, 'rb')
+	  xmlcheck = xmlbuff
+	  try:
+	    chunk = xmlcheck.read(1024)
+	    if '\0' in chunk:
+	      bincheck = True
+	    xmlcheck.close()
+	  finally:
+	    logging.debug("Binary file check complete")
 
-      if not bincheck:
-        logging.debug("XML file is not binary. No need to convert")
-        mfxmlpath = mfb
-      else:
-        logging.debug("Binary check complete") 
-        ## convert from the binary xml format to a parseable one
-        parse = axmlprinter.AXMLPrinter(open(mfb, 'rb').read())
-        prettyxml = xml.dom.minidom.parseString(parse.getBuff()).toxml()
+	  if not bincheck:
+	    logging.debug("XML file is not binary. No need to convert")
+	    mfxmlpath = mfb
+	  else:
+	    logging.debug("Binary check complete") 
+	    ## convert from the binary xml format to a parseable one
+	    try:
+	      parse = axmlprinter.AXMLPrinter(open(mfb, 'rb').read())
+	      prettyxml = xml.dom.minidom.parseString(parse.getBuff()).toxml()
 
-        #FIXME no need to use files any more. Send buffer directly in for processing
-        logging.debug("mfb  is: %s" % mfb)
-        mfxmlpath = "%s.xml" % mfb[:-4]
-        ofile = open(mfxmlpath, 'w')
-        if os.path.isfile(mfb):
-              ofile.write(prettyxml)
+	      #FIXME no need to use files any more. Send buffer directly in for processing
+              logging.debug("mfb  is: %s" % mfb)
+	      mfxmlpath = "%s.xml" % mfb[:-4]
+	      ofile = open(mfxmlpath, 'w')
+	      if os.path.isfile(mfb):
+                ofile.write(prettyxml)
 
-        if os.path.isfile(mfxmlpath):
-            logging.debug("successfully converted %s " % mfxmlpath)
+	        if os.path.isfile(mfxmlpath):
+	          logging.debug("successfully converted %s " % mfxmlpath)
               
-        ofile.close()
-        return mfxmlpath
+	      ofile.close()
+	    except:
+	      logging.error("Unable to convert AXML binary in %s" % mfb)
+	      
+          return mfxmlpath
 
 
     def manifestAudit(self, mf, device='None', database="report.db"):
